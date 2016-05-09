@@ -9,16 +9,16 @@ const yamlFront = require('yaml-front-matter');
 
 function loadDataFile(filePath) {
 	const fileContents = fs.readFileSync(filePath);
-	const type = path.extname(filePath);
+	const ext = path.extname(filePath);
 
-	if (type === '.yaml') {
+	if (ext === '.yaml' || ext === '.yml') {
 		return yaml.safeLoad(fileContents);
-	} else if (type === '.json') {
+	} else if (ext === '.json') {
 		return JSON.parse(fileContents);
 	}
 
 	const data = yamlFront.loadFront(fileContents, 'content');
-	if (type === '.md') {
+	if (ext === '.md') {
 		data.content = marked(data.content);
 	}
 
@@ -91,8 +91,11 @@ function templa(cb) {
 	// Render pages
 	pages.forEach((page) => {
 		const fileName = `${page.url.replace(/\/$/, '/index').replace(/^\//, '')}.html`;
-		const filePath = `./tmp/${fileName}`;
-		const output = nunjucks.render(`${page.template}.html.nunjucks`, Object.assign(
+		const filePath = path.format({
+			dir: config.outputDir,
+			base: fileName,
+		});
+		const output = nunjucks.render(`${page.template}.${config.templateExtension}`, Object.assign(
 			{},
 			globalData,
 			page.data
