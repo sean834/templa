@@ -1,0 +1,16 @@
+{
+  "name": "templo",
+  "version": "0.0.0",
+  "description": "Simple template builder for static sites",
+  "main": "templo.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scriptist/templo.git"
+  },
+  "author": "Michael Berman <me@scripti.st>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/scriptist/templo/issues"
+  },
+  "homepage": "https://github.com/scriptist/templo#readme"
+}
