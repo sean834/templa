@@ -1,6 +1,6 @@
 {
   "name": "templa",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple template builder for static sites",
   "main": "templa.js",
   "repository": {
