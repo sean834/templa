@@ -104,7 +104,7 @@ function templa(cb) {
 		fs.writeFileSync(filePath, output);
 	});
 
-	if (typeof cb === 'function') cb();
+	if (typeof cb === 'function') cb( globalData );
 }
 
 module.exports = templa;
