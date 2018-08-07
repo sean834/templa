@@ -5,6 +5,7 @@ const mkpath = require('mkpath');
 const nunjucks = require('nunjucks');
 const yaml = require('js-yaml');
 const yamlFront = require('yaml-front-matter');
+const jsonVariables = require('json-variables');
 
 
 function loadDataFile(filePath) {
@@ -45,10 +46,24 @@ function loadDataDir(dirPath) {
 
 function loadData(obj, baseDir) {
 	return obj.file ?
-		loadDataFile(path.format({ dir: baseDir, base: obj.file })) :
+		jsonVariables(loadDataFile(path.format({ dir: baseDir, base: obj.file }))) :
 		loadDataDir(path.format({ dir: baseDir, base: obj.dir }));
 }
 
+function doVariables(c) {
+//	c.blah = 44;
+// 	for(ee in c){
+// 		console.log(ee);
+// 	}
+	return;
+	for(key in c){
+		if(/\$\{/.test(c[key])){
+			//c[key] =
+		}
+	}
+
+
+}
 
 function templa(cb) {
 	const config = JSON.parse(fs.readFileSync('.templa.json'));
@@ -67,7 +82,6 @@ function templa(cb) {
 		});
 	}
 
-
 	// Get page list
 	const pages = [];
 	config.pages.forEach((pageType) => {
@@ -77,6 +91,17 @@ function templa(cb) {
 			const dataItems = loadData(pageType.data, config.baseDataDir, true);
 			const { key } = pageType.data;
 
+			if(pageType.data.globalKey) {
+				globalData[pageType.data.globalKey] = dataItems;
+
+				//TODO: verify this is always an array.
+				dataItems.forEach((item)=>{
+					doVariables(item);
+				});
+			}
+			//TODO: Expand variables in sizes. man. maybe right here.
+			//console.log(dataItems);
+			//console.log(Object.keys(pageType.data));
 			dataItems.forEach((data) => {
 				const url = pageType.url.replace(/:slug/g, data.slug);
 
@@ -87,6 +112,15 @@ function templa(cb) {
 			});
 		}
 	});
+
+
+	//SEAN
+	//config.globalData.global.junk = 23;
+// 	console.log('>>>')
+//  	console.log(pages);
+	//doVariables(globalData);
+
+
 
 	// Render pages
 	pages.forEach((page) => {
