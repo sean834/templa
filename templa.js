@@ -7,6 +7,7 @@ const yaml = require('js-yaml');
 const yamlFront = require('yaml-front-matter');
 const jsonVariables = require('json-variables');
 
+let options = {};
 
 function loadDataFile(filePath) {
 	const fileContents = fs.readFileSync(filePath);
@@ -45,9 +46,25 @@ function loadDataDir(dirPath) {
 }
 
 function loadData(obj, baseDir) {
-	return obj.file ?
-		jsonVariables(loadDataFile(path.format({ dir: baseDir, base: obj.file }))) :
-		loadDataDir(path.format({ dir: baseDir, base: obj.dir }));
+	opts = {
+		heads: "<",
+		tails: ">",
+	};
+	if (obj.file) {
+		let dataFile = loadDataFile(path.format({ dir: baseDir, base: obj.file }));
+		if(Array.isArray(dataFile)) {
+			dataFile = (jsonVariables({x: dataFile}, opts)).x;
+		} else {
+			dataFile = jsonVariables(dataFile, opts);
+		}
+
+				//console.log(dataFile);
+
+		return (dataFile);
+	} else {
+		return loadDataDir(path.format({ dir: baseDir, base: obj.dir }));
+	}
+
 }
 
 function doVariables(c) {
@@ -65,9 +82,15 @@ function doVariables(c) {
 
 }
 
-function templa(cb) {
+function templa(cb, templaOptions = {}) {
 	const config = JSON.parse(fs.readFileSync('.templa.json'));
-	nunjucks.configure(config.baseTemplateDir);
+	const env = nunjucks.configure(config.baseTemplateDir);
+	options = templaOptions;
+
+	if(typeof options.envFunction === 'function') {
+		options.envFunction(env);
+	}
+
 
 	// Get global data
 	const globalData = {};
